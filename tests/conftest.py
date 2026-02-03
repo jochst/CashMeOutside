@@ -10,10 +10,19 @@ from app.core.config import settings
 from app.db.session import Base
 
 # Test database URL
-TEST_DATABASE_URL = settings.DATABASE_URL.replace(
-    settings.DATABASE_URL.split("/")[-1],
-    "test_db"
-)
+from urllib.parse import urlparse, urlunparse
+
+parsed_url = urlparse(settings.DATABASE_URL)
+path_parts = parsed_url.path.rsplit('/', 1)
+new_path = f"{path_parts[0]}/test_db" if len(path_parts) > 1 else "/test_db"
+TEST_DATABASE_URL = urlunparse((
+    parsed_url.scheme,
+    parsed_url.netloc,
+    new_path,
+    parsed_url.params,
+    parsed_url.query,
+    parsed_url.fragment
+))
 
 # Create test engine
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)

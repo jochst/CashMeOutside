@@ -40,7 +40,11 @@ docker compose up -d
 
 echo ""
 echo "⏳ Waiting for database to be ready..."
-sleep 10
+until docker compose exec -T db pg_isready -U postgres > /dev/null 2>&1; do
+    echo "Database is not ready yet. Waiting..."
+    sleep 2
+done
+echo "✅ Database is ready!"
 
 # Run migrations
 echo ""
